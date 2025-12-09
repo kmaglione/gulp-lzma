@@ -1,16 +1,16 @@
 {
-  "name": "gulp-gzip",
-  "version": "1.4.2",
+  "name": "gulp-lzma",
+  "version": "1.0.0",
   "license": "MIT",
-  "description": "Gzip plugin for gulp.",
+  "description": "LZMA plugin for gulp.",
   "keywords": [
     "compress",
     "gulpplugin",
-    "gzip"
+    "lzma"
   ],
-  "repository": "https://github.com/jstuckey/gulp-gzip.git",
-  "homepage": "https://github.com/jstuckey/gulp-gzip/",
-  "author": "Jeremy Stuckey <jeremystuckey@gmail.com>",
+  "repository": "https://github.com/kmaglione/gulp-lzma.git",
+  "homepage": "https://github.com/kmaglione/gulp-lzma/",
+  "author": "Kris Maglione <maglione.k@gmail.com>",
   "main": "index.js",
   "scripts": {
     "test": "gulp"
@@ -21,13 +21,14 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://github.com/jstuckey/gulp-gzip/raw/master/LICENSE"
+      "url": "http://github.com/kmaglione/gulp-lzma/raw/master/LICENSE"
     }
   ],
   "dependencies": {
     "ansi-colors": "^1.0.1",
     "bytes": "^3.0.0",
     "fancy-log": "^1.3.2",
+    "lzma-native": "^8.0.6",
     "plugin-error": "^1.0.0",
     "stream-to-array": "^2.3.0",
     "through2": "^2.0.3"
@@ -44,7 +45,6 @@
     "jshint": "^2.9.5",
     "jshint-stylish": "~0.1.5",
     "mocha": "^5.2.0",
-    "nid": "^0.3.2",
-    "should": "^3.2.0-beta1"
+    "nid": "^0.3.2"
   }
 }

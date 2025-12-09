@@ -10,7 +10,7 @@ var colors      = require('ansi-colors');
 var utils       = require('./lib/utils');
 var compress    = require('./lib/compress.js');
 
-var PLUGIN_NAME = 'gulp-gzip';
+var PLUGIN_NAME = 'gulp-lzma';
 
 module.exports = function (options) {
 
@@ -18,18 +18,18 @@ module.exports = function (options) {
   var defaultConfig = {
     append: true,
     threshold: false,
-    gzipOptions: {},
+    lzmaOptions: {},
     skipGrowingFiles: false
   };
   var config = utils.merge(defaultConfig, options);
 
   // Create a through2 object stream. This is our plugin export
-  var stream = through2.obj(gulpGzip);
+  var stream = through2.obj(gulpLZMA);
 
   // Expose the config so we can test it
   stream.config = config;
 
-  function gulpGzip(file, enc, done) {
+  function gulpLZMA(file, enc, done) {
 
     /*jshint validthis: true */
     var self = this;
@@ -63,7 +63,7 @@ module.exports = function (options) {
         } else if (config.preExtension) {
           filepath = filepath.replace(/(\.[^\.]+)$/, '.' + config.preExtension + '$1');
         } else if (config.append) {
-          filepath += '.gz';
+          filepath += '.xz';
         }
 
         return filepath;
@@ -71,9 +71,9 @@ module.exports = function (options) {
 
       if (wasCompressed) {
         if (file.contentEncoding) {
-          file.contentEncoding.push('gzip');
+          file.contentEncoding.push('lzma');
         } else {
-          file.contentEncoding = [ 'gzip' ];
+          file.contentEncoding = [ 'lzma' ];
         }
 
         file.path = getFixedPath(file.path);
@@ -85,7 +85,7 @@ module.exports = function (options) {
 
         fs.exists(filepath, function(exists) {
           if(exists) {
-            fancyLog(colors.green('Gzipped file ' + filepath + ' deleted'));
+            fancyLog(colors.green('Xzipped file ' + filepath + ' deleted'));
             fs.unlink(filepath, complete);
           } else {
             complete();

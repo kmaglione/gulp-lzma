@@ -1,31 +1,36 @@
-gulp-gzip
+gulp-lzma
 =========
 
-Gzip plugin for [gulp](https://github.com/wearefractal/gulp).
+LZMA plugin for [gulp](https://github.com/wearefractal/gulp).
+
+This module is essentially a fork of [gulp-gzip][gulp-tzip] by Jeremy Stuckey,
+slightly modified to uze LZMA compression rather than gzip, by way of
+[lzma-native][lzma-native], and therefore [liblzma][liblzma]. All credit goes
+to the authors of those projects.
 
  # Install
 
 ```
-npm install --save-dev gulp-gzip
+npm install --save-dev gulp-lzma
 ```
 
 # Options
 
 ### append `Boolean`
 
-Appends `.gz` file extension if true. Defaults to true.
+Appends `.xz` file extension if true. Defaults to true.
 
 ```javascript
- gzip({ append: true })
+ lzma({ append: true })
 ```
-`filename.txt` becomes `filename.txt.gz`.
+`filename.txt` becomes `filename.txt.xz`.
 
 ### extension `String`
 
 Appends an arbitrary extension to the filename. Disables `append` and `preExtension` options.
 
 ```javascript
- gzip({ extension: 'zip' }) // note that the `.` should not be included in the extension
+ lzma({ extension: 'zip' }) // note that the `.` should not be included in the extension
 ```
 `filename.txt` becomes `filename.txt.zip`.
 
@@ -34,58 +39,58 @@ Appends an arbitrary extension to the filename. Disables `append` and `preExtens
 Appends an arbitrary pre-extension to the filename. Disables `append` and `extension` options.
 
 ```javascript
- gzip({ preExtension: 'gz' }) // note that the `.` should not be included in the extension
+ lzma({ preExtension: 'xz' }) // note that the `.` should not be included in the extension
 ```
-`filename.txt` becomes `filename.gz.txt`.
+`filename.txt` becomes `filename.xz.txt`.
 
 ### threshold `String|Number|Boolean`
 
 Minimum size required to compress a file. Defaults to false.
 
 ```javascript
-gzip({ threshold: '1kb' })
+lzma({ threshold: '1kb' })
 ```
 
 ```javascript
-gzip({ threshold: 1024 })
+lzma({ threshold: 1024 })
 ```
 
 ```javascript
-gzip({ threshold: true })
+lzma({ threshold: true })
 ```
 
-### gzipOptions `Object`
+### lzmaOptions `Object`
 
-Options object to pass through to zlib.Gzip. See [zlib documentation][gzip-options] for more information.
+Options object to pass through to lzma-native. See [lzma-native documentation][lzma-options] for more information.
 
 ```javascript
-gzip({ gzipOptions: { level: 9 } })
+lzma({ lzmaOptions: { preset: 9 } })
 ```
 
 ```javascript
-gzip({ gzipOptions: { memLevel: 1 } })
+lzma({ lzmaOptions: { memLevel: 1 } })
 ```
 
 ### deleteMode `String|Function`
 
-Some webserver modules such as nginx `gzip_static` looks for `example.html.gz`, serve it if it exists, else the original `example.html` will be served.
+Some webserver modules look for `example.html.xz`, serve it if it exists, else the original `example.html` will be served.
 
-For instance, if `example.html` was 2kb, it would be gzipped and `example.html.gz` was created.
+For instance, if `example.html` was 2kb, it would be xzipped and `example.html.xz` was created.
 
-However, if later `example.html` is modified to content less than the threshold, gulp-gzip will only bypass it. Hence, you will end up with a new `example.html` yet old `example.html.gz`. Your webserver will continue to serve old content (`example.html.gz`).
+However, if later `example.html` is modified to content less than the threshold, gulp-lzma will only bypass it. Hence, you will end up with a new `example.html` yet old `example.html.xz`. Your webserver will continue to serve old content (`example.html.xz`).
 
-Using this option, gulp-gzip will remove `example.html.gz`.
+Using this option, gulp-lzma will remove `example.html.xz`.
 
-It takes in the same argument as `gulp.dest` as in `gulp.dest('mydest')`, so it knows where to look for the gzipped files. Defaults to `undefined`.
+It takes in the same argument as `gulp.dest` as in `gulp.dest('mydest')`, so it knows where to look for the xzipped files. Defaults to `undefined`.
 
 ```javascript
-gzip({ threshold: 1024, deleteMode: 'mydest' })
+lzma({ threshold: 1024, deleteMode: 'mydest' })
 ```
 
 If you have `cwd` as in `gulp.dest('mydest', { cwd: mycwd })`. You can configure it using `deleteModeCwd`.
 
 ```javascript
-gzip({ threshold: 1024, deleteMode: 'mydest', deleteModeCwd: mycwd })
+lzma({ threshold: 1024, deleteMode: 'mydest', deleteModeCwd: mycwd })
 ```
 
 ### skipGrowingFiles `Boolean`
@@ -93,18 +98,18 @@ gzip({ threshold: 1024, deleteMode: 'mydest', deleteModeCwd: mycwd })
 Some files actually get larger after compression. If true, this option passes along the original, uncompressed file if compression increases the file size. Defaults to false.
 
 ```javascript
- gzip({ skipGrowingFiles : true })
+ lzma({ skipGrowingFiles : true })
 ```
 
 # Examples
 
 ```javascript
 var gulp = require('gulp');
-var gzip = require('gulp-gzip');
+var lzma = require('gulp-lzma');
 
 gulp.task('compress', function() {
     gulp.src('./dev/scripts/*.js')
-	.pipe(gzip())
+	.pipe(lzma())
 	.pipe(gulp.dest('./public/scripts'));
 });
 ```
@@ -114,14 +119,14 @@ var gulp = require('gulp');
 var coffee = require('gulp-coffee');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
-var gzip = require('gulp-gzip');
+var lzma = require('gulp-lzma');
 
 gulp.task('deployScripts', function() {
 	gulp.src('./dev/scripts/*.coffee')
 	.pipe(coffee())
 	.pipe(concat('all.js'))
 	.pipe(uglify())
-	.pipe(gzip())
+	.pipe(lzma())
 	.pipe(gulp.dest('./public/scripts'));
 });
 ```
@@ -129,17 +134,20 @@ gulp.task('deployScripts', function() {
 ```javascript
 var gulp = require('gulp');
 var tar = require('gulp-tar');
-var gzip = require('gulp-gzip');
+var lzma = require('gulp-lzma');
 
 gulp.task('tarball', function() {
 	gulp.src('./files/*')
 	.pipe(tar('archive.tar'))
-	.pipe(gzip())
+	.pipe(lzma())
 	.pipe(gulp.dest('.'));
 });
 ```
 
-[More examples](https://github.com/jstuckey/gulp-gzip/tree/master/examples).
+[More examples](https://github.com/kmaglione/gulp-lzma/tree/master/examples).
 
 
-  [gzip-options]: https://nodejs.org/api/zlib.html#zlib_class_options
+  [gulp-gzip]: https://github.com/jstuckey/gulp-gzip
+  [liblzma]: https://github.com/kobolabs/liblzma
+  [lzma-native]: https://github.com/addaleax/lzma-native
+  [lzma-options]: https://github.com/addaleax/lzma-native#api-options
