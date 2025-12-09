@@ -4,7 +4,7 @@ var log    = require('fancy-log');
 var lzma   = require('../');
 var nid    = require('nid');
 var rename = require('gulp-rename');
-var should = require('should');
+var expect = require('chai').expect;
 var Stream = require('stream');
 var tap    = require('gulp-tap');
 var lzmaNative = require('lzma-native');
@@ -19,7 +19,7 @@ describe('gulp-lzma', function() {
 
     it('should have default config', function(done) {
       var instance = lzma();
-      instance.config.should.eql({
+      expect(instance.config).to.deep.equal({
         append: true,
         lzmaOptions: {},
         skipGrowingFiles: false,
@@ -30,7 +30,7 @@ describe('gulp-lzma', function() {
 
     it('should merge options with defaults', function(done) {
       var instance = lzma({ append: false });
-      instance.config.should.eql({
+      expect(instance.config).to.deep.equal({
         append: false,
         lzmaOptions: {},
         skipGrowingFiles: false,
@@ -46,7 +46,7 @@ describe('gulp-lzma', function() {
       gulp.src('files/small.txt')
         .pipe(lzma())
         .pipe(tap(function(file) {
-          file.path.should.endWith('.xz');
+          expect(file.path).to.match(/\.xz$/);
           done();
         }));
     });
@@ -55,7 +55,7 @@ describe('gulp-lzma', function() {
       gulp.src('files/small.txt')
         .pipe(lzma({ append: false }))
         .pipe(tap(function(file) {
-          file.path.should.not.endWith('.xz');
+          expect(file.path).to.not.match(/\.xz$/);
           done();
         }));
     });
@@ -64,7 +64,7 @@ describe('gulp-lzma', function() {
         gulp.src('files/small.txt')
           .pipe(lzma({ extension: 'zip' }))
           .pipe(tap(function(file) {
-            file.path.should.endWith('.zip');
+            expect(file.path).to.match(/\.zip$/);
             done();
           }));
     });
@@ -73,7 +73,7 @@ describe('gulp-lzma', function() {
         gulp.src('files/small.txt')
           .pipe(lzma({ preExtension: 'xz' }))
           .pipe(tap(function(file) {
-            file.path.should.endWith('.xz.txt');
+            expect(file.path).to.match(/\.xz\.txt$/);
             done();
           }));
     });
@@ -85,7 +85,7 @@ describe('gulp-lzma', function() {
       gulp.src('files/small.txt')
         .pipe(lzma())
         .pipe(tap(function(file) {
-          file.contents.should.be.instanceof(Buffer);
+          expect(file.contents).to.be.an.instanceof(Buffer);
           done();
         }));
     });
@@ -94,7 +94,7 @@ describe('gulp-lzma', function() {
       gulp.src('files/small.txt', { buffer: false })
         .pipe(lzma())
         .pipe(tap(function(file) {
-          file.contents.should.be.instanceof(Stream);
+          expect(file.contents).to.be.an.instanceof(Stream);
           done();
         }));
     });
@@ -108,7 +108,7 @@ describe('gulp-lzma', function() {
         }))
         .pipe(lzma())
         .pipe(tap(function(file) {
-          file.should.have.property('test', 'test');
+          expect(file).to.have.property('test', 'test');
           done();
         }));
     });
@@ -117,8 +117,8 @@ describe('gulp-lzma', function() {
       gulp.src('files/small.txt')
         .pipe(lzma())
         .pipe(tap(function(file) {
-          file.should.have.property('contentEncoding');
-          file.contentEncoding.should.containEql('lzma');
+          expect(file).to.have.property('contentEncoding');
+          expect(file.contentEncoding).to.have.include('lzma');
           done();
         }));
     });
@@ -128,9 +128,9 @@ describe('gulp-lzma', function() {
 
     it('should set lzmaOptions object', function(done) {
       var instance = lzma({ lzmaOptions: { preset: 9, memLevel: 1} });
-      instance.config.should.have.property('lzmaOptions');
-      instance.config.lzmaOptions.should.have.property('preset', 9);
-      instance.config.lzmaOptions.should.have.property('memLevel', 1);
+      expect(instance.config).to.have.property('lzmaOptions');
+      expect(instance.config.lzmaOptions).to.have.property('preset', 9);
+      expect(instance.config.lzmaOptions).to.have.property('memLevel', 1);
       done();
     });
 
@@ -149,7 +149,7 @@ describe('gulp-lzma', function() {
           size_lowest_compression = stats.size;
 
           if (size_highest_compression > 0) {
-            size_highest_compression.should.be.lessThan(size_lowest_compression);
+            expect(size_highest_compression).to.be.lessThan(size_lowest_compression);
             done();
           }
         });
@@ -160,7 +160,7 @@ describe('gulp-lzma', function() {
           size_highest_compression = stats.size;
 
           if (size_lowest_compression > 0) {
-            size_highest_compression.should.be.lessThan(size_lowest_compression);
+            expect(size_highest_compression).to.be.lessThan(size_lowest_compression);
             done();
           }
         });
@@ -192,7 +192,7 @@ describe('gulp-lzma', function() {
           size_lowest_compression = stats.size;
 
           if (size_highest_compression > 0) {
-            size_highest_compression.should.be.lessThan(size_lowest_compression);
+            expect(size_highest_compression).to.be.lessThan(size_lowest_compression);
             done();
           }
         });
@@ -203,7 +203,7 @@ describe('gulp-lzma', function() {
           size_highest_compression = stats.size;
 
           if (size_lowest_compression > 0) {
-            size_highest_compression.should.be.lessThan(size_lowest_compression);
+            expect(size_highest_compression).to.be.lessThan(size_lowest_compression);
             done();
           }
         });
@@ -225,37 +225,37 @@ describe('gulp-lzma', function() {
 
     it('should set threshold to false while receiving false', function(done) {
       var instance = lzma({ threshold: false });
-      instance.config.threshold.should.be.false;
+      expect(instance.config.threshold).to.be.false;
       done();
     });
 
     it('should set threshold to 150 while receiving true', function(done) {
       var instance = lzma({ threshold: true });
-      instance.config.threshold.should.eql(150);
+      expect(instance.config.threshold).to.equal(150);
       done();
     });
 
     it('should set threshold to Number while receiving Number', function(done) {
       var instance = lzma({ threshold: 1024 });
-      instance.config.should.have.property('threshold', 1024);
+      expect(instance.config).to.have.property('threshold', 1024);
       done();
     });
 
     it('should set threshold to 150 while receiving Number < 150', function(done) {
       var instance = lzma({ threshold: 100 });
-      instance.config.should.have.property('threshold', 150);
+      expect(instance.config).to.have.property('threshold', 150);
       done();
     });
 
     it('should set threshold to Number while receiving String (bytes result)', function(done) {
       var instance = lzma({ threshold: '1kb' });
-      instance.config.should.have.property('threshold', 1024);
+      expect(instance.config).to.have.property('threshold', 1024);
       done();
     });
 
     it('should set threshold to 150 while receiving String (bytes result < 150)', function(done) {
       var instance = lzma({ threshold: '1kb' });
-      instance.config.should.have.property('threshold', 1024);
+      expect(instance.config).to.have.property('threshold', 1024);
       done();
     });
 
@@ -266,7 +266,7 @@ describe('gulp-lzma', function() {
       out.on('end', function() {
         fs.readFile('./tmp/' + id + '.txt', { encoding: 'utf-8' }, function(err, file) {
           fs.readFile('./files/small.txt', { encoding: 'utf-8' }, function(err, original) {
-            file.should.equal(original);
+            expect(file).to.equal(original);
             done();
           });
         });
@@ -288,7 +288,7 @@ describe('gulp-lzma', function() {
             file = buffer.toString('utf-8');
 
             fs.readFile('./files/big.txt', { encoding: 'utf-8' }, function(err, original) {
-              file.should.equal(original);
+              expect(file).to.equal(original);
               done();
             });
           });
@@ -308,7 +308,7 @@ describe('gulp-lzma', function() {
       out.on('end', function() {
         fs.readFile('./tmp/' + id + '.txt', { encoding: 'utf-8' }, function(err, file) {
           fs.readFile('./files/small.txt', { encoding: 'utf-8' }, function(err, original) {
-            file.should.equal(original);
+            expect(file).to.equal(original);
             done();
           });
         });
@@ -330,7 +330,7 @@ describe('gulp-lzma', function() {
             file = buffer.toString('utf-8');
 
             fs.readFile('./files/big.txt', { encoding: 'utf-8' }, function(err, original) {
-              file.should.equal(original);
+              expect(file).to.equal(original);
               done();
             });
           });
@@ -352,16 +352,16 @@ describe('gulp-lzma', function() {
 
       out.on('end', function() {
         fs.readFile('./tmp/' + id + '.txt.xz', function(err, file) {
-          should.not.exist(err);
-          should.exist(file);
-          file.should.not.be.empty;
+          expect(err).to.not.exist;
+          expect(file).to.exist;
+          expect(file).to.not.be.empty;
 
           var out = gulp.dest('tmp');
           out.on('end', function() {
             fs.readFile('./tmp/' + id + '.txt.xz', function(err, file) {
-              should.not.exist(err);
-              should.exist(file);
-              file.should.not.be.empty;
+              expect(err).to.not.exist;
+              expect(file).to.exist;
+              expect(file).to.not.be.empty;
               done();
             });
           });
@@ -385,15 +385,15 @@ describe('gulp-lzma', function() {
 
       out.on('end', function() {
         fs.readFile('./tmp/' + id + '.txt.xz', function(err, file) {
-          should.not.exist(err);
-          should.exist(file);
-          file.should.not.be.empty;
+          expect(err).to.not.exist;
+          expect(file).to.exist;
+          expect(file).to.not.be.empty;
 
           var out = gulp.dest('tmp');
 
           out.on('end', function() {
             fs.exists('./tmp/' + id + '.txt.xz', function(exists) {
-              exists.should.be.false;
+              expect(exists).to.be.false;
               done();
             });
           });
@@ -424,7 +424,7 @@ describe('gulp-lzma', function() {
             file = buffer.toString('utf-8', 0, buffer.length);
 
             fs.readFile('./files/small.txt', { encoding: 'utf-8' }, function(err, original) {
-              file.should.equal(original);
+              expect(file).to.equal(original);
               done();
             });
           });
@@ -447,7 +447,7 @@ describe('gulp-lzma', function() {
             file = buffer.toString('utf-8', 0, buffer.length);
 
             fs.readFile('./files/small.txt', { encoding: 'utf-8' }, function(err, original) {
-              file.should.equal(original);
+              expect(file).to.equal(original);
               done();
             });
           });
@@ -470,7 +470,7 @@ describe('gulp-lzma', function() {
         }))
         .pipe(lzma({ skipGrowingFiles: true }))
         .pipe(tap(function(file) {
-          file.contents.should.equal(originalBuffer);
+          expect(file.contents).to.equal(originalBuffer);
           done();
         }));
     });
@@ -483,7 +483,7 @@ describe('gulp-lzma', function() {
         }))
         .pipe(lzma({ skipGrowingFiles: true }))
         .pipe(tap(function(file) {
-          file.contents.should.equal(originalStream);
+          expect(file.contents).to.equal(originalStream);
           done();
         }));
     });
