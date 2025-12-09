@@ -4,10 +4,14 @@ var log    = require('fancy-log');
 var lzma   = require('../');
 var nid    = require('nid');
 var rename = require('gulp-rename');
-var expect = require('chai').expect;
+var chai   = require('chai');
 var Stream = require('stream');
 var tap    = require('gulp-tap');
 var lzmaNative = require('lzma-native');
+
+var expect = chai.expect;
+
+chai.use(require('chai-string').default);
 
 // monkeys are fixing cwd for gulp-mocha
 // node lives in one process/scope/directory
@@ -46,7 +50,7 @@ describe('gulp-lzma', function() {
       gulp.src('files/small.txt')
         .pipe(lzma())
         .pipe(tap(function(file) {
-          expect(file.path).to.match(/\.xz$/);
+          expect(file.path).to.endWith('.xz');
           done();
         }));
     });
@@ -55,7 +59,7 @@ describe('gulp-lzma', function() {
       gulp.src('files/small.txt')
         .pipe(lzma({ append: false }))
         .pipe(tap(function(file) {
-          expect(file.path).to.not.match(/\.xz$/);
+          expect(file.path).to.not.endWith('.xz');
           done();
         }));
     });
@@ -64,7 +68,7 @@ describe('gulp-lzma', function() {
         gulp.src('files/small.txt')
           .pipe(lzma({ extension: 'zip' }))
           .pipe(tap(function(file) {
-            expect(file.path).to.match(/\.zip$/);
+            expect(file.path).to.endWith('.zip');
             done();
           }));
     });
@@ -73,7 +77,7 @@ describe('gulp-lzma', function() {
         gulp.src('files/small.txt')
           .pipe(lzma({ preExtension: 'xz' }))
           .pipe(tap(function(file) {
-            expect(file.path).to.match(/\.xz\.txt$/);
+            expect(file.path).to.endWith('.xz.txt');
             done();
           }));
     });
